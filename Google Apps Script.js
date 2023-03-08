@@ -22,7 +22,6 @@ function SubmitButtomChecked(){
 }
 
 function ClearButtomChecked(){
-
   if( m_IsCleared == true ){
     ClearUpdateWorkSheet();
     m_StatusCell.setBackground('#77FF00');
@@ -204,6 +203,42 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
     var m_BaseTransportB = m_BaseSheet.getRange("M11").getValue();
     var m_BaseTransportC = m_BaseSheet.getRange("M12").getValue();
 
+  // Mobility & Park & Flexibility
+  m_BaseMobilityData = m_BaseSheet.getRange("N3").getValue();
+  m_UpdatedMobilityData = m_ctrSheet.getRange("F15").getValue();
+  m_BaseParkData = m_BaseSheet.getRange("N7").getValue();
+  m_UpdatedParkData = m_ctrSheet.getRange("F19").getValue();
+  m_BaseFlexibilityData = m_BaseSheet.getRange("N11").getValue();
+  m_UpdatedFlexibilityData = m_ctrSheet.getRange("F23").getValue();
+
+    // Mobility
+    var m_ctrMobilityCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedMobilityData);
+    var m_newTMobilityCellValue = ( m_ctrMobilityCellValue + ( m_BaseMobilityData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
+    m_UpdatedMobilityData = m_newTMobilityCellValue;
+
+    // Park
+    var m_ctrParkCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedParkData);
+    var m_newTParkCellValue = ( m_ctrParkCellValue + ( m_BaseParkData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
+    m_UpdatedParkData = m_newTParkCellValue;
+
+    // Flexibility
+    var m_ctrFlexibilityCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedFlexibilityData);
+    var m_newTFlexibilityCellValue = ( m_ctrFlexibilityCellValue + ( m_BaseFlexibilityData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
+    m_UpdatedFlexibilityData = m_newTFlexibilityCellValue;
+  
+  // Penalty
+  var m_UpdatedTeamPenalty = m_ctrSheet.getRange("D2").getValue();
+  var m_BaseTeamPenalty = m_BaseSheet.getRange("O7").getValue();
+  var m_newTeamPenalty = ( m_BaseTeamPenalty + ( m_UpdatedTeamPenalty * m_DataUpdateFrequency ) ) / (m_DataUpdateFrequency+1);
+
+  // Penalty
+  m_ctrSheet.getRange("D2").setValue(m_newTeamPenalty);
+
+  // Mobility & Park & Flexibility
+  m_ctrSheet.getRange("F15").setValue(m_UpdatedMobilityData);
+  m_ctrSheet.getRange("F19").setValue(m_UpdatedParkData);
+  m_ctrSheet.getRange("F23").setValue(m_UpdatedFlexibilityData);
+
   // 3-Dim
     // Defence
     m_ctrSheet.getRange("G3").setValue( m_UpdatedDefenceA + ( m_BaseDefenceA == true ? 1 : 0 ) ); // A
@@ -236,16 +271,5 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
   m_ctrSheet.getRange("C15:E23").setValues(m_UpdatedAutoGridData);
 
   // Data Frequency
-  m_ctrSheet.getRange("D1").setValue(m_DataUpdateFrequency+1);
-}
-
-function testfunction(){
-  var m_ctrSheet = m_Sheet.getSheets()[1];
-  var m_DataUpdateFrequency = m_ctrSheet.getRange("D1").getValue();
-
-  var m_CellValue = Math.ceil(m_DataUpdateFrequency * m_ctrSheet.getRange("C15").getValue());
-  var m_newCellValue = (m_CellValue + ( m_BaseSheet.getRange("B3") == true ? 0 : 1 )) / (m_DataUpdateFrequency+1);
-
-  m_ctrSheet.getRange("C15").setValue(m_newCellValue);
   m_ctrSheet.getRange("D1").setValue(m_DataUpdateFrequency+1);
 }
