@@ -8,8 +8,6 @@ var m_IsCleared = m_IsClearedButtom.getValue();
 var m_flag = 0;
 
 function SubmitButtomChecked(){
-  
-  // m_IsUpdated = true;
   if( m_IsUpdated == true ){
     var m_UpdatedSheetName = m_BaseSheet.getRange("D14").getValue();
     UpdateSpecifyWorkSheetData(m_UpdatedSheetName);
@@ -38,44 +36,48 @@ function ClearButtomChecked(){
 }
 
 function ClearUpdateWorkSheet(){
-  var m_GridFalse = [
-                      [false, false, false], // 0
-                      [false, false, false], // 1
-                      [false, false, false], // 2
-                      [false, false, false], // 3
-                      [false, false, false], // 4
-                      [false, false, false], // 5
-                      [false, false, false], // 6
-                      [false, false, false], // 7
-                      [false, false, false], // 8
-                    ];
+  var m_GridFalse 
+    = [
+        [false, false, false], // 0
+        [false, false, false], // 1
+        [false, false, false], // 2
+        [false, false, false], // 3
+        [false, false, false], // 4
+        [false, false, false], // 5
+        [false, false, false], // 6
+        [false, false, false], // 7
+        [false, false, false], // 8
+      ];
   
-  var m_DefFalse = [ 
-                      [false], // 0
-                      [false], // 1
-                      [false], // 2
-                      [false], // 3
-                      [false], // 4
-                      [false], // 5
-                      [false], // 6
-                      [false], // 7
-                      [false], // 8
-                   ];
+  var m_DefFalse 
+    = [ 
+        [false], // 0
+        [false], // 1
+        [false], // 2
+        [false], // 3
+        [false], // 4
+        [false], // 5
+        [false], // 6
+        [false], // 7
+        [false], // 8
+      ];
 
-  var m_AtkFalse = [ 
-                      [false], // 0
-                      [false], // 1
-                      [false], // 2
-                      [false], // 3
-                      [false], // 4
-                      [false], // 5
-                   ];
+  var m_AtkFalse 
+    = [ 
+        [false], // 0
+        [false], // 1
+        [false], // 2
+        [false], // 3
+        [false], // 4
+        [false], // 5
+      ];
 
-  var m_MoveFalse = [ 
-                      [false], // 0
-                      [false], // 1
-                      [false], // 2
-                    ];
+  var m_MoveFalse 
+    = [
+        [false], // 0
+        [false], // 1
+        [false], // 2
+      ];
 
   m_BaseSheet.getRangeList(["A4", "A9",  "E4", "E9"]).setValue(false);
   m_BaseSheet.getRange("B3:D11").setValues(m_GridFalse);
@@ -112,8 +114,8 @@ function ClearSpecifyWorkSheetData( m_UpdatedSheetName ) {
 }
 
 function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
-  var m_ctrSheet = m_Sheet.getSheetByName(m_UpdatedSheetName);
-  // var m_ctrSheet = m_Sheet.getSheets()[1];
+  // var m_ctrSheet = m_Sheet.getSheetByName(m_UpdatedSheetName);
+  var m_ctrSheet = m_Sheet.getSheets()[1];
   var m_DataUpdateFrequency = m_ctrSheet.getRange("D1").getValue();
   
   // Grid
@@ -168,7 +170,6 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
     m_UpdatedTeleopDockData = m_newTeleopDockCellValue;
   
   // 3-Dim
-
     // Defence
     var m_UpdatedDefenceA = m_ctrSheet.getRange("G3").getValue();
     var m_UpdatedDefenceB = m_ctrSheet.getRange("G5").getValue();
@@ -196,15 +197,14 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
     var m_BaseAttackF = m_BaseSheet.getRange("M8").getValue();
 
     // Transport
-    var m_UpdatedTransportA = m_UpdatedSheet.getRange("J10").getValue();
-    var m_UpdatedTransportB = m_UpdatedSheet.getRange("J11").getValue();
-    var m_UpdatedTransportC = m_UpdatedSheet.getRange("J12").getValue();
+    var m_UpdatedTransportA = m_ctrSheet.getRange("J10").getValue();
+    var m_UpdatedTransportB = m_ctrSheet.getRange("J11").getValue();
+    var m_UpdatedTransportC = m_ctrSheet.getRange("J12").getValue();
     var m_BaseTransportA = m_BaseSheet.getRange("M10").getValue();
     var m_BaseTransportB = m_BaseSheet.getRange("M11").getValue();
     var m_BaseTransportC = m_BaseSheet.getRange("M12").getValue();
 
   // 3-Dim
-
     // Defence
     m_ctrSheet.getRange("G3").setValue( m_UpdatedDefenceA + ( m_BaseDefenceA == true ? 1 : 0 ) ); // A
     m_ctrSheet.getRange("G5").setValue( m_UpdatedDefenceB + ( m_BaseDefenceB == true ? 1 : 0 ) ); // B
