@@ -1,19 +1,30 @@
 var m_Sheet = SpreadsheetApp.getActiveSpreadsheet();
 var m_BaseSheet = m_Sheet.getSheets()[0];
-var m_IsUpdatedButtom = m_BaseSheet.getRange("C15");
-var m_IsClearedButtom = m_BaseSheet.getRange("E15");
+var m_IsUpdatedButton = m_BaseSheet.getRange("C15");
+var m_IsClearedButton = m_BaseSheet.getRange("E15");
 var m_StatusCell = m_BaseSheet.getRange("E16");
-var m_IsUpdated = m_IsUpdatedButtom.getValue();
-var m_IsCleared = m_IsClearedButtom.getValue();
+var m_IsUpdated = m_IsUpdatedButton.getValue();
+var m_IsCleared = m_IsClearedButton.getValue();
 var m_flag = 0;
 
 function SubmitButtomChecked(){
   if( m_IsUpdated == true ){
     var m_UpdatedSheetName = m_BaseSheet.getRange("D14").getValue();
-    UpdateSpecifyWorkSheetData(m_UpdatedSheetName);
-    m_StatusCell.setBackground('#77FF00');
-    m_StatusCell.setValue('Submit Successful');
-    m_IsUpdatedButtom.setValue(false);
+
+    if( m_UpdatedSheetName == "Update WorkSheet" ){
+      m_StatusCell.setBackground('#FF7575');
+      m_StatusCell.setValue('Submit To Wrong WorkSheet');
+      m_IsUpdatedButton.setValue(false);
+      m_flag++;
+    }else{
+      UpdateSpecifyWorkSheetData(m_UpdatedSheetName);
+      m_StatusCell.setBackground('#77FF00');
+      m_StatusCell.setValue('Submit Successful');
+      m_IsUpdatedButton.setValue(false);
+      m_flag++;
+    }
+
+    
   }else if( m_flag % 2 == 0 ){
     m_flag++;
     m_StatusCell.setBackground('#DDDDDD');
@@ -26,9 +37,10 @@ function ClearButtomChecked(){
     ClearUpdateWorkSheet();
     m_StatusCell.setBackground('#77FF00');
     m_StatusCell.setValue('Clear Successful');
-    m_IsClearedButtom.setValue(false);
-  }else if( m_flag % 2 == 0 ){
+    m_IsClearedButton.setValue(false);
     m_flag++;
+  }else if( m_flag % 2 == 0 ){
+    m_flag++; 
     m_StatusCell.setBackground('#DDDDDD');
     m_StatusCell.setValue("There Isn't Any Request");
   }
@@ -78,12 +90,13 @@ function ClearUpdateWorkSheet(){
         [false], // 2
       ];
 
-  m_BaseSheet.getRangeList(["A4", "A9",  "E4", "E9"]).setValue(false);
+  m_BaseSheet.getRangeList(["A4", "A9", "E4", "E9", "N3", "N7", "N11"]).setValue(false);
   m_BaseSheet.getRange("B3:D11").setValues(m_GridFalse);
   m_BaseSheet.getRange("F3:H11").setValues(m_GridFalse);
   m_BaseSheet.getRange("J3:J11").setValues(m_DefFalse);
   m_BaseSheet.getRange("M3:M8").setValues(m_AtkFalse);
   m_BaseSheet.getRange("M10:M12").setValues(m_MoveFalse);
+  m_BaseSheet.getRange("O7").setValue(0);
 }
 
 function ClearSpecifyWorkSheetData( m_UpdatedSheetName ) {
@@ -113,8 +126,8 @@ function ClearSpecifyWorkSheetData( m_UpdatedSheetName ) {
 }
 
 function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
-  // var m_ctrSheet = m_Sheet.getSheetByName(m_UpdatedSheetName);
-  var m_ctrSheet = m_Sheet.getSheets()[1];
+  var m_ctrSheet = m_Sheet.getSheetByName(m_UpdatedSheetName);
+  // var m_ctrSheet = m_Sheet.getSheets()[1];
   var m_DataUpdateFrequency = m_ctrSheet.getRange("D1").getValue();
   
   // Grid
@@ -125,13 +138,8 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
 
   for( var i = 0 ; i < 3 ; i++ ){
     for( var j = 0 ; j < 9 ; j++ ){
-      var m_TeleopCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedTeleopGridData[j][i]);
-      var m_newTeleopCellValue = ( m_TeleopCellValue + ( m_BaseTeleopGridData[j][i] == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);
-      m_UpdatedTeleopGridData[j][i] = m_newTeleopCellValue;
-
-      var m_AutoCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedAutoGridData[j][i]);
-      var m_newAutoCellValue = ( m_AutoCellValue + ( m_BaseAutoGridData[j][i] == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);
-      m_UpdatedAutoGridData[j][i] = m_newAutoCellValue;
+      m_UpdatedTeleopGridData[j][i] = getPercentData(m_DataUpdateFrequency, m_UpdatedTeleopGridData[j][i], m_BaseTeleopGridData[j][i]);
+      m_UpdatedAutoGridData[j][i] = getPercentData(m_DataUpdateFrequency, m_UpdatedAutoGridData[j][i], m_BaseAutoGridData[j][i]);
     }
   }
 
@@ -149,24 +157,16 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
     var m_BaseTeleopDockData = m_BaseSheet.getRange("E9").getValue();
 
     // Auto Engage
-    var m_AutoEngageCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedAutoEngageData);
-    var m_newAutoEngageCellValue = ( m_AutoEngageCellValue + ( m_BaseAutoEngageData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
-    m_UpdatedAutoEngageData = m_newAutoEngageCellValue;
+    m_UpdatedAutoEngageData = getPercentData(m_DataUpdateFrequency, m_UpdatedAutoEngageData, m_BaseAutoEngageData);
 
     // Auto Dock
-    var m_AutoDockCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedAutoDockData);
-    var m_newAutoDockCellValue = ( m_AutoDockCellValue + ( m_BaseAutoDockData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);
-    m_UpdatedAutoDockData = m_newAutoDockCellValue;
+    m_UpdatedAutoDockData = getPercentData(m_DataUpdateFrequency, m_UpdatedAutoDockData, m_BaseAutoDockData);
 
     // Teleop Engage
-    var m_TeleopEngageCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedTeleopEngageData);
-    var m_newTeleopEngageCellValue = ( m_TeleopEngageCellValue + ( m_BaseTeleopEngageData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
-    m_UpdatedTeleopEngageData = m_newTeleopEngageCellValue;
+    m_UpdatedTeleopEngageData = getPercentData(m_DataUpdateFrequency, m_UpdatedTeleopEngageData, m_BaseTeleopEngageData);
 
     // Teleop Dock
-    var m_TeleopDockCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedTeleopDockData);
-    var m_newTeleopDockCellValue = ( m_TeleopDockCellValue + ( m_BaseTeleopDockData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);
-    m_UpdatedTeleopDockData = m_newTeleopDockCellValue;
+    m_UpdatedTeleopDockData = getPercentData(m_DataUpdateFrequency, m_UpdatedTeleopDockData, m_BaseTeleopDockData);
   
   // 3-Dim
     // Defence
@@ -212,19 +212,13 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
   m_UpdatedFlexibilityData = m_ctrSheet.getRange("F23").getValue();
 
     // Mobility
-    var m_ctrMobilityCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedMobilityData);
-    var m_newTMobilityCellValue = ( m_ctrMobilityCellValue + ( m_BaseMobilityData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
-    m_UpdatedMobilityData = m_newTMobilityCellValue;
+    m_UpdatedMobilityData = getPercentData(m_DataUpdateFrequency, m_UpdatedMobilityData, m_BaseMobilityData);
 
-    // Park
-    var m_ctrParkCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedParkData);
-    var m_newTParkCellValue = ( m_ctrParkCellValue + ( m_BaseParkData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
-    m_UpdatedParkData = m_newTParkCellValue;
+    // Park       
+    m_UpdatedParkData = getPercentData(m_DataUpdateFrequency, m_UpdatedParkData, m_BaseParkData);
 
-    // Flexibility
-    var m_ctrFlexibilityCellValue = Math.ceil(m_DataUpdateFrequency * m_UpdatedFlexibilityData);
-    var m_newTFlexibilityCellValue = ( m_ctrFlexibilityCellValue + ( m_BaseFlexibilityData == true ? 1 : 0 ) ) / (m_DataUpdateFrequency+1);         
-    m_UpdatedFlexibilityData = m_newTFlexibilityCellValue;
+    // Flexibility     
+    m_UpdatedFlexibilityData = getPercentData(m_DataUpdateFrequency, m_UpdatedFlexibilityData, m_BaseFlexibilityData);
   
   // Penalty
   var m_UpdatedTeamPenalty = m_ctrSheet.getRange("D2").getValue();
@@ -272,4 +266,9 @@ function UpdateSpecifyWorkSheetData( m_UpdatedSheetName ) {
 
   // Data Frequency
   m_ctrSheet.getRange("D1").setValue(m_DataUpdateFrequency+1);
+}
+
+function getPercentData( dataUpdateFrequency, inputData, baseData ) {
+  var m_ctrCellValue = Math.ceil( dataUpdateFrequency * inputData );
+  return ( m_ctrCellValue + ( baseData == true ? 1 : 0 ) ) / (dataUpdateFrequency+1);
 }
